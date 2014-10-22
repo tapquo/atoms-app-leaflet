@@ -19,7 +19,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
   @base     : "Leaflet"
 
-  @events   : ["query"]
+  @events   : ["touch", "query", "marker"]
 
   @default  :
     id: "leaflet"
@@ -54,19 +54,22 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
     @_map.setZoom level
 
   query: (value) ->
-    if typeof value is "string"
-      @_query = []
-      __geocode(value).then (error, results) =>
-        @_query = (__parseAddress result for result in results)
-        @bubble "query", @_query
+    @_query = []
+    __geocode(value).then (error, results) =>
+      @_query = (__parseAddress result for result in results)
+      @bubble "query", @_query
     true
 
-  marker: (position, icon, animate = false) ->
-    latLng = L?.latLng position.latitude, position.longitude
+  marker: (attributes) ->
+    latLng = L?.latLng attributes.latitude, attributes.longitude
     markerOptions =
-      icon : __markerIcon icon
+      icon      : __markerIcon attributes.icon
+      clickable : true
+      id        : attributes.id
     marker = new L?.marker latLng, markerOptions
     @_map.addLayer marker
+    if attributes.id
+      marker.on "click", (event) => @bubble "marker", id: event.target.options.id
     @_markers.push marker
     true
 
@@ -87,6 +90,9 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
     @_map = L?.map @attributes.id, mapOptions
     L?.tileLayer(tileUrl, tileOptions).addTo(@_map)
 
+    if "touch" in (@attributes.events or [])
+      @_map.on "click", (e) =>
+        @bubble "touch", latitude: e.latlng.lat, longitude: e.latlng.lng
 
 # ==============================================================================
 __markerIcon = (icon) ->
