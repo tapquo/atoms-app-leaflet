@@ -31,7 +31,8 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
   output: ->
     super
-    if Atoms.$("[data-extension=leaflet]").length > 0
+    console.log "leaflet", @attributes.id
+    if Atoms.$("[data-extension=leaflet]").length > 0 and L?
       do @__init
     else
       url = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet"
@@ -85,7 +86,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
       zoomControl: false
     tileUrl = @attributes.tile ? @_tileUrl
     tileOptions =
-      attribution: 'Map data &copy;
+      attribution: '&copy;
         <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
     @_map = L?.map @attributes.id, mapOptions
     L?.tileLayer(tileUrl, tileOptions).addTo(@_map)
