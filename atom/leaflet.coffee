@@ -121,7 +121,7 @@ __parseAddress = (address) ->
 
 __geocode = (value) ->
   promise = new Hope.Promise()
-  ajax = $$.ajax or $.ajax
+  ajax = $$?.ajax or $.ajax
   ajax
     url     : "http://nominatim.openstreetmap.org/search"
     data    : {q:value, format:'json'}
