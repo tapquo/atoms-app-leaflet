@@ -10,7 +10,7 @@
 
 class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
-  @version  : "1.0.1"
+  @version  : "1.0.3"
 
   @template : """
     <div id="{{id}}" {{#if.style}}class="{{style}}"{{/if.style}}>
@@ -19,7 +19,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
   @base     : "Leaflet"
 
-  @events   : ["touch", "query", "marker"]
+  @events   : ["touch", "query", "marker", "load"]
 
   @default  :
     id: "leaflet"
@@ -33,7 +33,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
     super
     console.log "leaflet", @attributes.id
     if Atoms.$("[data-extension=leaflet]").length > 0 and L?
-      do @__init
+      do @__load
     else
       url = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet"
       Hope.chain([ =>
@@ -42,7 +42,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
         Atoms.resource "leaflet", "script", "#{url}.js"
       ]).then (error, value) =>
         unless error
-          do @__init
+          do @__load
         else
           console.error "Atoms.App.Leaflet error loading resources"
 
@@ -78,22 +78,27 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
     @_map.removeLayer marker for marker in @_markers
     @_markers = []
 
-  # Privates
-  __init: =>
-    mapOptions =
-      center     : [43.256963, -2.923441]
-      zoom       : 1
-      zoomControl: false
-    tileUrl = @attributes.tile ? @_tileUrl
-    tileOptions =
-      attribution: '&copy;
-        <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-    @_map = L?.map @attributes.id, mapOptions
-    L?.tileLayer(tileUrl, tileOptions).addTo(@_map)
+  # -- Privates ----------------------------------------------------------------
+  __load: =>
+    @handleInterval = setInterval =>
+      if L?.tileLayer?
+        clearInterval @handleInterval
+        @bubble "load"
 
-    if "touch" in (@attributes.events or [])
-      @_map.on "click", (e) =>
-        @bubble "touch", latitude: e.latlng.lat, longitude: e.latlng.lng
+        tileUrl = @attributes.tile ? @_tileUrl
+        tileOptions =
+          attribution: '&copy;
+            <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        @_map = L?.map @attributes.id,
+          center     : [43.256963, -2.923441]
+          zoom       : 1
+          zoomControl: false
+        L?.tileLayer(tileUrl, tileOptions).addTo(@_map)
+
+        if "touch" in (@attributes.events or [])
+          @_map.on "click", (e) =>
+            @bubble "touch", latitude: e.latlng.lat, longitude: e.latlng.lng
+    , 200
 
 # ==============================================================================
 __markerIcon = (icon) ->
