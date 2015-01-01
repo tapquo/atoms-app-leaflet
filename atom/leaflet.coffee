@@ -14,7 +14,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
   @template : """
     <div id="{{id}}" {{#if.style}}class="{{style}}"{{/if.style}}>
-      <span class="icon loading-config"></span>
+      <span class="loading-animation"></span>
     </div>"""
 
   @base     : "Leaflet"
