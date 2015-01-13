@@ -31,8 +31,7 @@ class Atoms.Atom.Leaflet extends Atoms.Class.Atom
 
   output: ->
     super
-    console.log "leaflet", @attributes.id
-    if Atoms.$("[data-extension=leaflet]").length > 0 and L?
+gi    if Atoms.$("[data-extension=leaflet]").length > 0 and L?
       do @__load
     else
       url = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet"

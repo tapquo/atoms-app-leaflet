@@ -1,6 +1,6 @@
 {
   "name": "atoms-app-leaflet",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "atoms.app.leaflet.js",
   "homepage": "http://atoms.tapquo.com",
   "license": "MIT",
